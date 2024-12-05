@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: bggapp-deploy
+  namespace: bggns
+  labels: 
+    app: bggapp
+spec: 
+  replicas: 3
+  selector: 
+    matchLabels: 
+      app: bggapp
+  template: 
+    metadata: 
+      name: bggapp
+      namespace: bggns
+      labels: 
+        app: bggapp
+    spec:
+      containers:
+      - name: bggapp
+        image: stackupiss/bgg-backend:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: app-port
+          containerPort: 3000
+        env:
+        - name: BGG_DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: bggapp-config
+              key: bgg_db_user
+        - name: BGG_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: bggapp-config
+              key: bgg_db_host
+        - name: BGG_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bggapp-secret
+              key: bgg_db_password
+    
+
+---
+apiVersion: v1 
+kind: Service 
+metadata: 
+  name: bggapp-svc 
+  namespace: bggns 
+  labels: 
+    app: bggapp
+spec:
+  type: ClusterIP
+  # type: NodePort # exposes this outside of the cluster. modifies the IP table from the port in
+  # type: LoadBalancer
+  selector: 
+    app: bggapp
+  ports: 
+  - name: web
+    port: 8080 # service port
+    targetPort: 3000 # pod port
+
+

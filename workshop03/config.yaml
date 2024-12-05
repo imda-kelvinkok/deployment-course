@@ -1,0 +1,25 @@
+---
+# create namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: codeserver
+
+---
+# create configmap
+apiVersion: v1 
+kind: ConfigMap 
+metadata:
+  name: codeserver-cm 
+  namespace: codeserver 
+
+---
+# create secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ingress-secret
+  namespace: codeserver
+data:
+  password: cGFzc3dvcmQ=
+  sudo_password: cGFzc3dvcmQ=
